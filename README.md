@@ -8,28 +8,28 @@
 [![Join Telegram group](https://img.shields.io/badge/Telegram_group-Join-blue.svg?style=social&logo=telegram)](https://t.me/nfqws)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Anonym-tsk/nfqws-keenetic)
 
-Пакеты для установки `nfqws` на маршрутизаторы.
+Packages for installing `nfqws` on routers.
 
 > [!IMPORTANT]
-> Данный материал подготовлен в научно-технических целях.
-> Использование предоставленных материалов в целях отличных от ознакомления может являться нарушением действующего законодательства.
-> Автор не несет ответственности за неправомерное использование данного материала.
+> This material was prepared for scientific and technical purposes.
+> Use of the materials provided for purposes other than information may be a violation of applicable law.
+> The author is not responsible for the unlawful use of this material.
 
 > [!WARNING]
-> **Вы пользуетесь этой инструкцией на свой страх и риск!**
+> **You use these instructions at your own peril and risk!**
 > 
-> Автор не несёт ответственности за порчу оборудования и программного обеспечения, проблемы с доступом и потенцией.
-> Подразумевается, что вы понимаете, что вы делаете.
+> The author is not responsible for damage to equipment and software, problems with access and potency.
+> It assumes that you understand what you are doing.
 
-Изначально написано для роутеров Keenetic/Netcraze с установленным entware.
-Однако, работоспособность также была проверена на прошивках Padavan и OpenWRT (читайте ниже).
+Originally written for Keenetic/Netcraze routers with entware installed.
+However, performance was also tested on Padavan and OpenWRT firmware (read below).
 
 Списки проверенного оборудования собираем в [отдельной теме](https://github.com/Anonym-tsk/nfqws-keenetic/discussions/1).
 <details>
   <summary>Собранный список моделей из темы</summary>
  
-  - Билайн Smart Box GIGA
-  - Билайн Smart Box Turbo
+  - Beeline Smart Box GIGA
+  - Beeline Smart Box Turbo
   - ASUS ROG Rapture GT-AX6000
   - ASUS RT-AC51U
   - ASUS RT-AC68U
@@ -97,15 +97,15 @@
 
 Поделиться опытом можно в разделе [Discussions](https://github.com/Anonym-tsk/nfqws-keenetic/discussions) или в [чате](https://t.me/nfqws).
 
-### Что это?
+### What is this?
 
-`nfqws` - утилита для модификации TCP соединения на уровне пакетов, работает через обработчик очереди NFQUEUE и raw сокеты.
+`nfqws` - ​​a utility for modifying a TCP connection at the packet level, works through the NFQUEUE queue handler and raw sockets.
 
 Почитать подробнее можно на [странице авторов](https://github.com/bol-van/zapret) (ищите по ключевому слову `nfqws`).
 
-### Подготовка Keenetic/Netcraze
+### Preparing Keenetic/Netcraze
 
-- Прочитайте инструкцию полностью, прежде, чем начать что-то делать!
+- Read the instructions completely before you start doing anything!
 
 - Рекомендуется игнорировать предложенные провайдером адреса DNS-серверов. Для этого в интерфейсе роутера отметьте пункты ["игнорировать DNS от провайдера"](https://help.keenetic.com/hc/ru/articles/360008609399) в настройках IPv4 и IPv6.
  
@@ -113,31 +113,31 @@
 
 - Установить entware на маршрутизатор по инструкции [на встроенную память роутера](https://help.keenetic.com/hc/ru/articles/360021888880) или [на USB-накопитель](https://help.keenetic.com/hc/ru/articles/360021214160).
 
-- Через web-интерфейс Keenetic/Netcraze установить пакеты **Протокол IPv6** (**Network functions > IPv6**) и **Модули ядра подсистемы Netfilter** (**OPKG > Kernel modules for Netfilter** - не путать с "Netflow"). Обратите внимание, что второй компонент отобразится в списке пакетов только после того, как вы отметите к установке первый.
+- Using the Keenetic/Netcraze web interface, install the packages **IPv6 Protocol** (**Network functions > IPv6**) and **Netfilter subsystem kernel modules** (**OPKG > Kernel modules for Netfilter** - not to be confused with "Netflow"). Please note that the second component will appear in the list of packages only after you select the first one for installation.
 
-- В разделе "Интернет-фильтры" отключить все сторонние фильтры (NextDNS, SkyDNS, Яндекс DNS и другие).
+- In the "Internet filters" section, disable all third-party filters (NextDNS, SkyDNS, Yandex DNS and others).
 
-- Все дальнейшие команды выполняются не в cli роутера, а **в среде entware**. Подключиться в неё можно несколькими способами:
-  - Через telnet: в терминале выполнить `telnet 192.168.1.1`, а потом `exec sh`.
-  - Или же подключиться напрямую через SSH (логин - `root`, пароль по умолчанию - `keenetic`, порт - 222 или 22). Для этого в терминале написать `ssh 192.168.1.1 -l root -p 222`.
+- All further commands are executed not in the router’s cli, but **in the entware environment**. You can connect to it in several ways:
+  - Via telnet: in the terminal, run `telnet 192.168.1.1`, and then `exec sh`.
+  - Or connect directly via SSH (login - `root`, default password - `keenetic`, port - 222 or 22). To do this, write `ssh 192.168.1.1 -l root -p 222` in the terminal.
 
 ---
 
-### Установка на Keenetic/Netcraze и другие системы с Entware
+### Installation on Keenetic/Netcraze and other systems with Entware
 
-1. Установите необходимые зависимости
+1. Install required dependencies
    ```bash
    opkg update
    opkg install ca-certificates wget-ssl
    opkg remove wget-nossl
    ```
 
-2. Установите opkg-репозиторий в систему
+2. Install the opkg repository on the system
    ```bash
    mkdir -p /opt/etc/opkg
    echo "src/gz nfqws-keenetic https://anonym-tsk.github.io/nfqws-keenetic/all" > /opt/etc/opkg/nfqws-keenetic.conf
    ```
-   Репозиторий универсальный, поддерживаемые архитектуры: `mipsel`, `mips`, `mips64`, `aarch64`, `armv7`, `x86`, `x86_64`, `lexra`.
+The repository is universal, supported architectures: `mipsel`, `mips`, `mips64`, `aarch64`, `armv7`, `x86`, `x86_64`, `lexra`.
 
    <details>
      <summary>Или можете выбрать репозиторий под конкретную архитектуру</summary>
@@ -161,23 +161,23 @@
        ```
    </details>
 
-3. Установите пакет
+3. Install the package
    ```bash
    opkg update
    opkg install nfqws-keenetic
    ```
 
-4. Установите веб-интерфейс (опционально)
+4. Install the web interface (optional)
    ```bash
    opkg install nfqws-keenetic-web
    ```
 > [!NOTE]
 > Адрес веб-интерфейса `http://<router_ip>:90` (например http://192.168.1.1:90)<br/>
-> Для авторизации введите имя пользователя и пароль пользователя entware (по умолчанию root и keenetic если не меняли при установке)
+> To authorize, enter the username and password of the entware user (by default root and keenetic if not changed during installation)
 
 > [!TIP]
-> По-умолчанию php использует только 8Мб памяти. Из-за этого ограничения, могут не загружаться большие списки файлов.
-> Вы можете изменить конфигурацию php самостоятельно:<br/>
+> By default, php uses only 8MB of memory. Due to this limitation, large lists of files may not be downloaded.
+> You can change the php configuration yourself:<br/>
 > Откройте файл `/opt/etc/php.ini` и измените следующие значения
 > ```ini
 > memory_limit = 32M
@@ -185,7 +185,7 @@
 > upload_max_filesize = 16M
 > ```
 
-##### Обновление
+##### Update
 
 ```bash
 opkg update
@@ -193,106 +193,106 @@ opkg upgrade nfqws-keenetic
 opkg upgrade nfqws-keenetic-web
 ```
 
-##### Удаление
+##### Removal
 
 ```bash
 opkg remove --autoremove nfqws-keenetic-web nfqws-keenetic
 ```
 
-##### Информация об установленной версии
+##### Information about the installed version
 
 ```bash
 opkg info nfqws-keenetic
 opkg info nfqws-keenetic-web
 ```
 
-### Политики доступа на Keenetic/Netcraze
+### Access policies on Keenetic/Netcraze
 
-На Keenetic/Netcraze можно создать политику доступа **NFQWS** (Приоритеты подключений – Политики доступа в интернет)
-и после перезапуска nfqws-keenetic будет работать только для устройств из этой политики.<br/>
-_Не забудьте поставить галочку на интерфейсе провайдера в созданной политике._
+On Keenetic/Netcraze you can create an access policy **NFQWS** (Connection priorities - Internet access policies)
+and after restarting nfqws-keenetic will only work for devices from this policy.<br/>
+_Don't forget to check the box on the provider interface in the created policy._
 
-Можно сделать политику исключения, добавив в конфиг `POLICY_EXCLUDE=1`. Тогда будет обрабатываться трафик для всех устройств, кроме тех, что добавлены в политику `NFQWS`.<br/>
-Имя политики можно изменить в конфиге, параметр `POLICY_NAME`.
+You can make an exclusion policy by adding `POLICY_EXCLUDE=1` to the config. Then traffic will be processed for all devices except those added to the `NFQWS` policy.<br/>
+The policy name can be changed in the config, parameter `POLICY_NAME`.
 
-Если политика с таким именем не найдена, будет обрабатываться весь трафик.
+If a policy with the same name is not found, all traffic will be processed.
 
 ---
 
-### Установка на OpenWRT
+### Installing OpenWRT
 
-#### До версии 24.10 включительно, пакетный менеджер `opkg`
+#### Up to version 24.10 inclusive, package manager `opkg`
 
-1. Установите необходимые зависимости
+1. Install required dependencies
    ```bash
    opkg update
    opkg install ca-certificates wget-ssl
    opkg remove wget-nossl
    ```
 
-2. Установите публичный ключ репозитория
+2. Set the repository public key
    ```bash
    wget -O "/tmp/nfqws-keenetic.pub" "https://anonym-tsk.github.io/nfqws-keenetic/openwrt/nfqws-keenetic.pub"
    opkg-key add /tmp/nfqws-keenetic.pub
    ```
 
-3. Установите репозиторий в систему
+3. Install the repository on the system
    ```bash
    echo "src/gz nfqws-keenetic https://anonym-tsk.github.io/nfqws-keenetic/openwrt" > /etc/opkg/nfqws-keenetic.conf
    ```
-   Репозиторий универсальный, поддерживаемые архитектуры: `mipsel`, `mips`, `mips64`, `aarch64`, `armv7`, `x86`, `x86_64`, `lexra`.
+The repository is universal, supported architectures: `mipsel`, `mips`, `mips64`, `aarch64`, `armv7`, `x86`, `x86_64`, `lexra`.
    Для добавления поддержки новых устройств, [создайте Feature Request](https://github.com/Anonym-tsk/nfqws-keenetic/issues/new?template=feature_request.md&title=%5BFeature+request%5D+)
 
-4. Установите пакет
+4. Install the package
    ```bash
    opkg update
    opkg install nfqws-keenetic
    ```
 
-5. Установите веб-интерфейс (опционально)
+5. Install the web interface (optional)
    ```bash
    opkg install nfqws-keenetic-web
    ```
 
-#### Версии 25.xx и Snapshot, пакетный менеджер `apk`
+#### Versions 25.xx and Snapshot, package manager `apk`
 
-1. Установите необходимые зависимости
+1. Install required dependencies
    ```bash
    apk --update-cache add ca-certificates wget-ssl
    apk del wget-nossl
    ```
 
-2. Установите публичный ключ репозитория
+2. Set the repository public key
    ```bash
    wget -O "/etc/apk/keys/nfqws-keenetic.pem" "https://anonym-tsk.github.io/nfqws-keenetic/openwrt/nfqws-keenetic.pem"
    ```
 
-3. Установите репозиторий в систему
+3. Install the repository on the system
    ```bash
    echo "https://anonym-tsk.github.io/nfqws-keenetic/openwrt/packages.adb" > /etc/apk/repositories.d/nfqws-keenetic.list
    ```
-   Репозиторий универсальный, поддерживаемые архитектуры: `mipsel`, `mips`, `mips64`, `aarch64`, `armv7`, `x86`, `x86_64`, `lexra`.
+The repository is universal, supported architectures: `mipsel`, `mips`, `mips64`, `aarch64`, `armv7`, `x86`, `x86_64`, `lexra`.
    Для добавления поддержки новых устройств, [создайте Feature Request](https://github.com/Anonym-tsk/nfqws-keenetic/issues/new?template=feature_request.md&title=%5BFeature+request%5D+)
 
-4. Установите пакет
+4. Install the package
    ```bash
    apk --update-cache add nfqws-keenetic
    ```
 
-5. Установите веб-интерфейс (опционально)
+5. Install the web interface (optional)
    ```bash
    apk add nfqws-keenetic-web
    ```
 
 > [!NOTE]
-> NB: Все пути файлов, описанные в этой инструкции, начинающиеся с `/opt`, на OpenWRT будут начинаться с корня `/`.
-> Например конфиг расположен в `/etc/nfqws/nfqws.conf`
+> NB: All file paths described in this manual starting with `/opt` will start with the root `/` on OpenWRT.
+> For example, the config is located in `/etc/nfqws/nfqws.conf`
 > 
-> Для запуска/остановки используйте команду `service nfqws-keenetic {start|stop|restart|reload|status}`
+> To start/stop use the command `service nfqws-keenetic {start|stop|restart|reload|status}`
 
 ---
 
-### Настройки
+### Settings
 
 Файл настроек расположен по пути `/opt/etc/nfqws/nfqws.conf`. Для редактирования можно воспользоваться встроенным редактором `vi` или установить `nano`.
 
@@ -344,18 +344,18 @@ POLICY_EXCLUDE=0|1
 LOG_LEVEL=0|1
 ```
 
-Стратегии применяются ко всем доменам из `user.list` и `auto.list`, за исключением доменов из `exclude.list`.<br/>
-В конфиге есть 3 варианта параметра `NFQWS_EXTRA_ARGS` - это режим работы nfqws:
-- В режиме `$MODE_LIST` будут обрабатываться только домены из файла `user.list`
-- В режиме `$MODE_AUTO` кроме этого будут автоматически определяться недоступные домены и добавляться в список, по которому `nfqws` обрабатывает трафик. Домен будет добавлен, если за 60 секунд будет 3 раза определено, что ресурс недоступен
-- В режиме `$MODE_ALL` будет обрабатываться весь трафик кроме доменов из списка `exclude.list`
+The strategies apply to all domains from `user.list` and `auto.list`, with the exception of domains from `exclude.list`.<br/>
+In the config there are 3 options for the `NFQWS_EXTRA_ARGS` parameter - this is the nfqws operating mode:
+- In `$MODE_LIST` mode only domains from the `user.list` file will be processed
+- In the `$MODE_AUTO` mode, in addition, unavailable domains will be automatically detected and added to the list by which `nfqws` processes traffic. The domain will be added if within 60 seconds it is determined 3 times that the resource is unavailable
+- In `$MODE_ALL` mode all traffic will be processed except domains from the `exclude.list` list
 
-Также, есть два IP-списка: `ipset.list` и `ipset_exclude.list`.
-Адреса из списков применяются в любых режимах работы.
+Also, there are two IP lists: `ipset.list` and `ipset_exclude.list`.
+Addresses from the lists are used in any operating mode.
 
 ---
 
-### Полезное
+### Useful
 
 1. Конфиг-файл `/opt/etc/nfqws/nfqws.conf`
 2. Скрипт запуска/остановки `/opt/etc/init.d/S51nfqws {start|stop|restart|reload|status}`
@@ -363,53 +363,53 @@ LOG_LEVEL=0|1
 4. Автоматически добавленные домены `/opt/etc/nfqws/auto.list`
 5. Лог автоматически добавленных доменов `/opt/var/log/nfqws.log`
 6. Домены-исключения `/opt/etc/nfqws/exclude.list` (один домен на строке, поддомены учитываются автоматически)
-7. IP-список для обработки `ipset.list` (на каждой строчке ip или cidr ipv4, или ipv6)
-8. IP-список для исключения `ipset_exclude.list`
-9. Проверить, что нужные правила добавлены в таблицу маршрутизации `iptables-save | grep "queue-num 200"`
-   > Вы должны увидеть похожие строки
+7. IP list for processing `ipset.list` (on each line ip or cidr ipv4, or ipv6)
+8. IP list to exclude `ipset_exclude.list`
+9. Check that the necessary rules have been added to the routing table `iptables-save | grep "queue-num 200"`
+   > You should see similar lines
    > ```
    > -A POSTROUTING -o eth3 -p tcp -m tcp --dport 443 -m connbytes --connbytes 1:6 --connbytes-mode packets --connbytes-dir original -m mark ! --mark 0x40000000/0x40000000 -j NFQUEUE --queue-num 200 --queue-bypass
    > ```
 
-### Если ничего не работает...
+### If nothing works...
 
-1. Если ваше устройство поддерживает аппаратное ускорение (flow offloading, hardware nat, hardware acceleration), то iptables могут не работать.
-   При включенном offloading пакет не проходит по обычному пути netfilter.
-   Необходимо или его отключить, или выборочно им управлять.
+1. If your device supports hardware acceleration (flow offloading, hardware nat, hardware acceleration), then iptables may not work.
+When offloading is enabled, the packet does not go through the normal netfilter path.
+It is necessary to either disable it or selectively manage it.
 2. На Keenetic/Netcraze можно попробовать выключить или наоборот включить [сетевой ускоритель](https://help.keenetic.com/hc/ru/articles/214470905)
-3. Возможно, стоит выключить службу классификации трафика IntelliQOS.
-4. Можно попробовать отключить IPv6 на сетевом интерфейсе провайдера через веб-интерфейс маршрутизатора.
-5. Можно попробовать запретить весь UDP трафик на 443 порт для отключения QUIC:
-   > Межсетевой экран → Домашняя сеть → Добавить правило<br/>
-   > Включить правило: Включено<br/>
-   > Описание: Блокировать QUIC<br/>
-   > Действие: Запретить<br/>
-   > Протокол: UDP<br/>
-   > Номер порта назначения: Равен 443<br/>
-   > Остальные параметры оставляем без изменений
+3. It may be worth turning off the IntelliQOS traffic classification service.
+4. You can try disabling IPv6 on the ISP's network interface through the router's web interface.
+5. You can try to block all UDP traffic on port 443 to disable QUIC:
+   > Firewall → Home Network → Add Rule<br/>
+   > Enable rule: Enabled<br/>
+   > Description: Block QUIC<br/>
+   > Action: Deny<br/>
+   > Protocol: UDP<br/>
+   > Destination port number: Equal to 443<br/>
+   > We leave the remaining parameters unchanged
 
-### Частые проблемы
+### Common problems
 1. `iptables: No chain/target/match by that name`<br/>
-   Не установлен пакет "Модули ядра подсистемы Netfilter". На Keenetic/Netcraze он появляется в списке пакетов только после установки "Протокол IPv6"
+The "Netfilter subsystem kernel modules" package is not installed. On Keenetic/Netcraze it appears in the list of packages only after installing "IPv6 Protocol"
 2. `can't initialize ip6tables table` и/или `Perhaps ip6tables or your kernel needs to be upgraded`<br/>
-   Не установлен пакет "Протокол IPv6". Также, проблема может появляться на старых прошивках 2.xx, выключите поддержку IPv6 в конфиге NFQWS
-3. Ошибки вида `readlink: not found`, `dirname: not found`<br/>
-   Обычно возникают не на кинетиках. Решение - установить busybox: `opkg install busybox` или отдельно пакеты `opkg install coreutils-readlink coreutils-dirname`
+The IPv6 protocol package is not installed. Also, the problem may appear on older firmware 2.xx, disable IPv6 support in the NFQWS config
+3. Sight errors `readlink: not found`, `dirname: not found`<br/>
+Usually do not occur on kinetics. The solution is to install busybox: `opkg install busybox` or separate packages `opkg install coreutils-readlink coreutils-dirname`
 4. `Failed to download the package list from https://anonym-tsk.github.io/nfqws-keenetic/all/Packages.gz`<br/>
-   Скорее всего не устеновлен пакет `wget-ssl`. Если вы уверены, что он установлен – переустановите его: `opkg install --force-reinstall wget-ssl`
+Most likely the `wget-ssl` package is not installed. If you are sure that it is installed, reinstall it: `opkg install --force-reinstall wget-ssl`
 
-### Как использовать несколько стратегий
+### How to use multiple strategies
 
-Можно добавить дополнительные стратегии в опции `NFQWS_ARGS_CUSTOM` в конфиге и разделять их параметром `--new`.
-Например, стратегия ниже применит опцию `--dpi-desync=fake,split2` для HTTPS запросов к доменам из `custom.list`,
-а для HTTP запросов будет использовать `--dpi-desync=disorder2 --dpi-desync-fooling=md5sig,badseq`:
+You can add additional strategies to the `NFQWS_ARGS_CUSTOM` options in the config and separate them with the `--new` parameter.
+For example, the strategy below will use the `--dpi-desync=fake,split2` option for HTTPS requests to domains from `custom.list`,
+and for HTTP requests it will use `--dpi-desync=disorder2 --dpi-desync-fooling=md5sig,badseq`:
 ```bash
 NFQWS_ARGS_CUSTOM="--filter-tcp=443 --dpi-desync=fake,split2 --hostlist=custom.list --new --filter-tcp=80 --dpi-desync=disorder2 --dpi-desync-fooling=md5sig,badseq"
 ```
 
-### Как подобрать рабочую стратегию NFQWS
+### How to choose a working NFQWS strategy
 
-1. Запустить скрипт и следовать его инструкциям
+1. Run the script and follow its instructions
    ```bash
    opkg install curl
    /bin/sh -c "$(curl -fsSL https://github.com/Anonym-tsk/nfqws-keenetic/raw/master/common/strategy.sh)"
